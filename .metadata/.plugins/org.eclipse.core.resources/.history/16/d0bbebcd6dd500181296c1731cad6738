@@ -1,0 +1,208 @@
+package zoo.dao;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+
+import zoo.beans.Animal;
+
+public class AnimalDAO {
+
+	// Create, Read, Update, Delete (read) ALL
+
+	/**
+	 * Insère un animal en base de données
+	 * 
+	 * @param animal
+	 *            L'animal à insérer
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
+
+	public static void Create(Animal animal) throws ClassNotFoundException, SQLException {
+		Connection cnx = initConnection();
+
+		try {
+			// Statement statement = cnx.createStatement();
+			// statement.executeUpdate("INSERT INTO animal(Nom, Taille, Poids, Date_mesure,
+			// Date_naissance, Type)"
+			// +"VALUES('"
+			// +animal.getNom() + " ',"
+			// +animal.getPoids()/*....*/ + ")");
+
+			// 3.操作数据库，实现增删改查
+
+			PreparedStatement statement = cnx.prepareStatement("INSERT INTO animal"
+					+ "(Nom, Taille, Poids, Date_mesure, Date_naissance, Type) " + "VALUES (?,?,?,?,?,?)");
+
+			statement.setString(1, animal.getNom());
+			statement.setInt(2, animal.getTaille());
+			statement.setInt(3, animal.getPoids());
+			statement.setDate(4, java.sql.Date.valueOf(animal.getDateMesure()));
+			statement.setDate(5, java.sql.Date.valueOf(animal.getDateNaissance()));
+			statement.setString(6, animal.getTypeAnimal());
+
+			statement.executeUpdate();
+			
+
+		} finally {
+			cnx.close();
+		}
+	}
+
+	public static Connection initConnection() throws ClassNotFoundException, SQLException {
+		// On vérifie si le driver existe dans notre projet
+		Class.forName("com.mysql.jdbc.Driver");
+
+		// On donne les information pour se connecter à la base de données
+		Connection cnx = DriverManager.getConnection("jdbc:mysql://localhost/zoo", "root", "12345678"); // 2. 获得数据库连接
+		return cnx;
+	}
+
+	/**
+	 * Récupère un animal
+	 * 
+	 * @param id
+	 *            l'identifiant de l'animal
+	 * @return l'animal correspondant à l'identifiant
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 */
+	public static Animal Read(int id) throws ClassNotFoundException, SQLException {
+		Animal animal = null;
+
+		Connection cnx = null;
+
+		try {
+			cnx = initConnection();
+
+			PreparedStatement statement = cnx.prepareStatement("SELECT * FROM animal WHERE id = ?");
+
+			// Le preparedStatement commence à 1!!!
+			statement.setInt(1, id);
+
+			ResultSet result = statement.executeQuery();
+			
+			while(result.next()) {
+				animal = initializeAnimalFromDB(result);
+			}
+
+		} finally {
+			cnx.close();
+		}
+		return animal;
+
+	}
+
+	private static Animal initializeAnimalFromDB(ResultSet result) throws SQLException {
+		Animal animal = new Animal();
+
+		int id = result.getInt("id");
+		// TODO : faire pareil pour les autres colonnes
+		animal.setId(id);
+		String nom = result.getString("Nom");
+		animal.setNom(nom);
+
+		int taille = result.getInt("Taille");
+		animal.setTaille(taille);
+
+		int poids = result.getInt("Poids");
+		animal.setPoids(poids);
+
+		String typeAnimal = result.getString("Type");
+		animal.setTypeAnimal(typeAnimal);
+
+		LocalDate dateMesure = null;
+		java.sql.Date dateMesureSQL = result.getDate("Date_mesure");
+		if (dateMesureSQL != null) {
+			dateMesure = dateMesureSQL.toLocalDate();
+		}
+		animal.setDateMesure(dateMesure);
+
+		
+		
+		LocalDate dateNaissance = null;
+		java.sql.Date dateNaissanceSQL = result.getDate("Date_naissance");
+		if (dateNaissanceSQL != null) {
+			dateNaissance = dateNaissanceSQL.toLocalDate();
+		}
+		animal.setDateNaissance(dateNaissance);
+
+		return animal;
+	}
+
+	/**
+	 * récupère un ensemble d'animaux
+	 * 
+	 * @return une liste d'animaux
+	 */
+	public static ArrayList<Animal> ReadAll() {
+		ArrayList<Animal> resultat = new ArrayList<>();
+		return resultat;
+
+	}
+
+	/**
+	 * Met à jour l'animal
+	 * 
+	 * @param animal
+	 *            l'animal à insérer
+	 * @return
+	 * @throws SQLException 
+	 * @throws ClassNotFoundException 
+	 */
+	public static Animal UpDate(Animal animal) throws SQLException, ClassNotFoundException {
+		//Update animal set nom = ?, poids =?...WHERE id = ?
+		
+		Connection cnx = initConnection();
+
+		try {
+		
+			PreparedStatement statement = cnx.prepareStatement("UPDATE Animal SET nom = ?,  taille =?, poids =?, Date_Mesure = ?, Date_Naissance = ? , Type = ?  WHERE id = ?");
+
+			statement.setString(1, animal.getNom());
+			statement.setInt(2, animal.getTaille());
+			statement.setInt(3, animal.getPoids());
+			statement.setDate(4, java.sql.Date.valueOf(animal.getDateMesure()));
+			statement.setDate(5, java.sql.Date.valueOf(animal.getDateNaissance()));
+			statement.setString(6, animal.getTypeAnimal());
+			statement.setInt(7,animal.getId());
+			statement.executeUpdate();
+
+		} finally {
+			cnx.close();
+		}
+		return animal;
+	}
+
+	/**
+	 * Supprime un animal dans la base
+	 * 
+	 * @param id
+	 *            l'identifiant de l'animal
+	 * @return true si l'animal a été supprimé
+	 * @throws SQLException 
+	 * @throws ClassNotFoundException 
+	 */
+	public static boolean Delete(int id) throws SQLException, ClassNotFoundException {
+		// Delete from animal where id =?
+		Connection cnx = initConnection();
+		
+        try {     	
+			PreparedStatement statement = cnx.prepareStatement("DELETE FROM animal WHERE id = ?");
+			
+			statement.setInt(1,id);
+			statement.executeUpdate();
+						
+		}   finally {
+			cnx.close();
+		}
+    	 
+		return false;
+	}
+
+}

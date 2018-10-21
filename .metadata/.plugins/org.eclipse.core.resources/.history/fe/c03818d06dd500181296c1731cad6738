@@ -1,0 +1,60 @@
+package zoo.dao;
+
+import java.sql.SQLException;
+import java.time.LocalDate;
+
+import zoo.beans.Animal;
+
+public class TestDAO {
+	
+	static final int id = 3;
+
+	public static void main(String[] args) {
+		
+	
+		
+		Animal monAnimal = new Animal();
+		monAnimal.setNom("Robert");
+		monAnimal.setPoids(20);
+		monAnimal.setTaille(5);
+		monAnimal.setTypeAnimal("Boa Constricteur");
+		
+		LocalDate dateNaissance = LocalDate.of(2015, 9, 21);
+		LocalDate dateMesure = LocalDate.of(2018, 10, 19);
+		
+		monAnimal.setDateNaissance(dateNaissance);
+		monAnimal.setDateMesure(dateMesure);
+		
+		try {
+			//AnimalDAO.Create(monAnimal);
+			
+			Animal monAnimal2 = AnimalDAO.Read(id);
+			
+			if (monAnimal2 != null) {
+				monAnimal2.setNom("Bernard");
+
+				AnimalDAO.UpDate(monAnimal2);
+				
+				Animal monAnimal3 = AnimalDAO.Read(id);
+				
+				System.out.println(monAnimal3.getNom());
+				
+				
+				
+			  AnimalDAO.Delete(id);
+					
+				}
+			
+			
+			else {
+				System.out.println("Je n'ai pas trouvé animal");
+			}
+			
+			
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+}

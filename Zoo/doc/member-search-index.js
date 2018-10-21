@@ -1,0 +1,1 @@
+memberSearchIndex = [{"p":"<Unnamed>","c":"Endroit","l":"Endroit()"},{"p":"<Unnamed>","c":"Endroit","l":"Endroit(String, long, int)","url":"Endroit-java.lang.String-long-int-"}]

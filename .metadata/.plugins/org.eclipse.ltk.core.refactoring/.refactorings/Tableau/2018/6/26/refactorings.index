@@ -1,0 +1,8 @@
+1530308584552	Rename package 'lesson'
+1530309873386	Copy compilation unit
+1530312673269	Convert local variable 'sc' to field
+1530315339718	Convert local variable 'v1' to field
+1530315389792	Inline local variable 'v2'
+1530315449721	Convert local variable 'v3' to field
+1530343666535	Delete element
+1530343709721	Delete element
